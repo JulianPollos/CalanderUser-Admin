@@ -1,0 +1,46 @@
+services:
+
+    php:
+        image: wodby/php:latest
+        container_name: skill_calender_php
+        volumes:
+            - './:/var/www/html'
+
+    nginx:
+        image: nginx:latest
+        container_name: skill_calender_nginx
+        ports:
+            - 80:80
+        links:
+            - php
+        volumes:
+            - './:/var/www/html'
+            - './docker:/etc/nginx/conf.d'
+        depends_on:
+            - php
+            - mariadb
+
+    mariadb:
+        image: mariadb:latest
+        container_name: skill_calender_mariadb
+        volumes:
+            - './:/var/www/html'
+        environment:
+            MYSQL_DATABASE: ${DB_NAME}
+            MYSQL_USER: ${DB_USER}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+        ports:
+            - 3356:3306
+
+    phpmyadmin:
+        image: phpmyadmin:latest
+        container_name: skill_calender_phpmyadmin
+        ports:
+            - 8805:80
+        depends_on:
+            - mariadb
+        environment:
+            PMA_HOST: ${DB_HOST}
+            PMA_USER: ${DB_USER}
+            PMA_PASSWORD: ${DB_PASSWORD}
